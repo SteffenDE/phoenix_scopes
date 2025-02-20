@@ -27,7 +27,7 @@ defmodule ScopesAppWeb.PostLive.Show do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    Blog.subscribe_posts(socket.assigns.user_scope)
+    Blog.subscribe_posts(socket.assigns.current_scope)
 
     {:ok,
      socket
@@ -40,7 +40,7 @@ defmodule ScopesAppWeb.PostLive.Show do
         {:updated, %ScopesApp.Blog.Post{id: id} = post},
         %{assigns: %{post: %{id: id}}} = socket
       ) do
-    {:noreply, assign(:post, post)}
+    {:noreply, assign(socket, :post, post)}
   end
 
   def handle_info(

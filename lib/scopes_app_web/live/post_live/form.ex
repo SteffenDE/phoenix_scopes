@@ -45,7 +45,7 @@ defmodule ScopesAppWeb.PostLive.Form do
   end
 
   defp apply_action(socket, :new, _params) do
-    post = %Post{}
+    post = %Post{user_id: socket.assigns.current_scope.user.id}
 
     socket
     |> assign(:page_title, "New Post")

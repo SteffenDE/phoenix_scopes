@@ -42,7 +42,7 @@ defmodule ScopesAppWeb.PostLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    Blog.subscribe_posts(socket.assigns.user_scope)
+    Blog.subscribe_posts(socket.assigns.current_scope)
 
     {:ok,
      socket
@@ -52,7 +52,7 @@ defmodule ScopesAppWeb.PostLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    post = Blog.get_post!(id)
+    post = Blog.get_post!(socket.assigns.current_scope, id)
     {:ok, _} = Blog.delete_post(socket.assigns.current_scope, post)
 
     {:noreply, stream_delete(socket, :posts, post)}
@@ -61,6 +61,6 @@ defmodule ScopesAppWeb.PostLive.Index do
   @impl true
   def handle_info({type, %ScopesApp.Blog.Post{}}, socket)
       when type in [:created, :updated, :deleted] do
-    {:noreply, stream(:posts, Blog.list_posts(socket.assigns.current_scope), reset: true)}
+    {:noreply, stream(socket, :posts, Blog.list_posts(socket.assigns.current_scope), reset: true)}
   end
 end
