@@ -7,18 +7,19 @@ defmodule ScopesApp.Blog do
   alias ScopesApp.Repo
 
   alias ScopesApp.Blog.Post
+  alias Foo.Accounts.UserScope
 
   @doc """
   Returns the list of posts.
 
   ## Examples
 
-      iex> list_posts()
+      iex> list_posts(scope)
       [%Post{}, ...]
 
   """
-  def list_posts do
-    Repo.all(Post)
+  def list_posts(%UserScope{} = user_scope) do
+    Repo.all(from post in Post, where: post.user_id == ^user_scope.user.id)
   end
 
   @doc """
@@ -35,7 +36,9 @@ defmodule ScopesApp.Blog do
       ** (Ecto.NoResultsError)
 
   """
-  def get_post!(id), do: Repo.get!(Post, id)
+  def get_post!(%UserScope{} = user_scope, id) do
+    Repo.get_by!(Post, [id: id, user_id: user_scope.user.id])
+  end
 
   @doc """
   Creates a post.
@@ -49,9 +52,9 @@ defmodule ScopesApp.Blog do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_post(attrs \\ %{}) do
+  def create_post(%UserScope{} = user_scope, attrs \\ %{}) do
     %Post{}
-    |> Post.changeset(attrs)
+    |> Post.changeset(attrs, user_scope)
     |> Repo.insert()
   end
 
@@ -67,9 +70,11 @@ defmodule ScopesApp.Blog do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_post(%Post{} = post, attrs) do
+  def update_post(%UserScope{} = user_scope, %Post{} = post, attrs) do
+    true = post.user_id == user_scope.user.id
+
     post
-    |> Post.changeset(attrs)
+    |> Post.changeset(attrs, user_scope)
     |> Repo.update()
   end
 
@@ -85,7 +90,9 @@ defmodule ScopesApp.Blog do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_post(%Post{} = post) do
+  def delete_post(%UserScope{} = user_scope, %Post{} = post) do
+    true = post.user_id == user_scope.user.id
+
     Repo.delete(post)
   end
 
@@ -98,7 +105,9 @@ defmodule ScopesApp.Blog do
       %Ecto.Changeset{data: %Post{}}
 
   """
-  def change_post(%Post{} = post, attrs \\ %{}) do
-    Post.changeset(post, attrs)
+  def change_post(%UserScope{} = user_scope, %Post{} = post, attrs \\ %{}) do
+    true = post.user_id == user_scope.user.id
+
+    Post.changeset(post, attrs, user_scope)
   end
 end

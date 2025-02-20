@@ -36,12 +36,12 @@ defmodule ScopesAppWeb.PostLive.Form do
   defp return_to(_), do: "index"
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    post = Blog.get_post!(, id)
+    post = Blog.get_post!(socket.assigns.current_scope, id)
 
     socket
     |> assign(:page_title, "Edit Post")
     |> assign(:post, post)
-    |> assign(:form, to_form(Blog.change_post(, post)))
+    |> assign(:form, to_form(Blog.change_post(socket.assigns.current_scope, post)))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -50,12 +50,12 @@ defmodule ScopesAppWeb.PostLive.Form do
     socket
     |> assign(:page_title, "New Post")
     |> assign(:post, post)
-    |> assign(:form, to_form(Blog.change_post(, post)))
+    |> assign(:form, to_form(Blog.change_post(socket.assigns.current_scope, post)))
   end
 
   @impl true
   def handle_event("validate", %{"post" => post_params}, socket) do
-    changeset = Blog.change_post(, socket.assigns.post, post_params)
+    changeset = Blog.change_post(socket.assigns.current_scope, socket.assigns.post, post_params)
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
@@ -64,7 +64,7 @@ defmodule ScopesAppWeb.PostLive.Form do
   end
 
   defp save_post(socket, :edit, post_params) do
-    case Blog.update_post(, socket.assigns.post, post_params) do
+    case Blog.update_post(socket.assigns.current_scope, socket.assigns.post, post_params) do
       {:ok, post} ->
         {:noreply,
          socket
@@ -77,7 +77,7 @@ defmodule ScopesAppWeb.PostLive.Form do
   end
 
   defp save_post(socket, :new, post_params) do
-    case Blog.create_post(, post_params) do
+    case Blog.create_post(socket.assigns.current_scope, post_params) do
       {:ok, post} ->
         {:noreply,
          socket

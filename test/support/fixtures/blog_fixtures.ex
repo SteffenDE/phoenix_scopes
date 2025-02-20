@@ -7,14 +7,13 @@ defmodule ScopesApp.BlogFixtures do
   @doc """
   Generate a post.
   """
-  def post_fixture(attrs \\ %{}) do
-    {:ok, post} =
-      attrs
-      |> Enum.into(%{
-        body: "some body",
+  def post_fixture(scope, attrs \\ %{}) do
+    attrs = Enum.into(attrs, %{
+              body: "some body",
         title: "some title"
-      })
-      |> ScopesApp.Blog.create_post()
+            })
+
+    {:ok, post} = ScopesApp.Blog.create_post(scope, attrs)
     
     post
   end

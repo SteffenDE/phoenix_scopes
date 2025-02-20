@@ -30,6 +30,6 @@ defmodule ScopesAppWeb.PostLive.Show do
     {:ok,
      socket
      |> assign(:page_title, "Show Post")
-     |> assign(:post, Blog.get_post!(, id))}
+     |> assign(:post, Blog.get_post!(socket.assigns.current_scope, id))}
   end
 end

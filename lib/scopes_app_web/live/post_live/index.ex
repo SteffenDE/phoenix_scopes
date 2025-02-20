@@ -45,13 +45,13 @@ defmodule ScopesAppWeb.PostLive.Index do
     {:ok,
      socket
      |> assign(:page_title, "Listing Posts")
-     |> stream(:posts, Blog.list_posts())}
+     |> stream(:posts, Blog.list_posts(socket.assigns.current_scope))}
   end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     post = Blog.get_post!(id)
-    {:ok, _} = Blog.delete_post(, post)
+    {:ok, _} = Blog.delete_post(socket.assigns.current_scope, post)
 
     {:noreply, stream_delete(socket, :posts, post)}
   end
