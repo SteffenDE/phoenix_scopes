@@ -81,6 +81,7 @@ defmodule ScopesApp.BlogTest do
       scope = user_scope_fixture()
       other_scope = user_scope_fixture()
       post = post_fixture(scope)
+
       assert_raise MatchError, fn ->
         Blog.delete_post(other_scope, post)
       end

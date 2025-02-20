@@ -10,6 +10,28 @@ defmodule ScopesApp.Blog do
   alias Foo.Accounts.UserScope
 
   @doc """
+  Subscribes to scoped notifications about any post changes.
+
+  The broadcasted messages match the pattern:
+
+    * {:created, %Post{}}
+    * {:updated, %Post{}}
+    * {:deleted, %Post{}}
+
+  """
+  def subscribe_posts(%UserScope{} = user_scope) do
+    key = user_scope.user.id
+
+    Phoenix.PubSub.subscribe(ScopesApp.PubSub, "user:#{key}:posts")
+  end
+
+  defp broadcast(%UserScope{} = user_scope, message) do
+    key = user_scope.user.id
+
+    Phoenix.PubSub.broadcast(ScopesApp.PubSub, "user:#{key}:posts", message)
+  end
+
+  @doc """
   Returns the list of posts.
 
   ## Examples
@@ -37,7 +59,7 @@ defmodule ScopesApp.Blog do
 
   """
   def get_post!(%UserScope{} = user_scope, id) do
-    Repo.get_by!(Post, [id: id, user_id: user_scope.user.id])
+    Repo.get_by!(Post, id: id, user_id: user_scope.user.id)
   end
 
   @doc """
@@ -53,9 +75,13 @@ defmodule ScopesApp.Blog do
 
   """
   def create_post(%UserScope{} = user_scope, attrs \\ %{}) do
-    %Post{}
-    |> Post.changeset(attrs, user_scope)
-    |> Repo.insert()
+    with {:ok, post = %Post{}} <-
+           %Post{}
+           |> Post.changeset(attrs, user_scope)
+           |> Repo.insert() do
+      broadcast(user_scope, {:created, post})
+      {:ok, post}
+    end
   end
 
   @doc """
@@ -73,9 +99,13 @@ defmodule ScopesApp.Blog do
   def update_post(%UserScope{} = user_scope, %Post{} = post, attrs) do
     true = post.user_id == user_scope.user.id
 
-    post
-    |> Post.changeset(attrs, user_scope)
-    |> Repo.update()
+    with {:ok, post = %Post{}} <-
+           post
+           |> Post.changeset(attrs, user_scope)
+           |> Repo.update() do
+      broadcast(user_scope, {:updated, post})
+      {:ok, post}
+    end
   end
 
   @doc """
@@ -93,7 +123,11 @@ defmodule ScopesApp.Blog do
   def delete_post(%UserScope{} = user_scope, %Post{} = post) do
     true = post.user_id == user_scope.user.id
 
-    Repo.delete(post)
+    with {:ok, post = %Post{}} <-
+           Repo.delete(post) do
+      broadcast(user_scope, {:deleted, post})
+      {:ok, post}
+    end
   end
 
   @doc """

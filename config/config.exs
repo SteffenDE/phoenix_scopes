@@ -61,7 +61,7 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :phoenix, :scopes, [
+config :phoenix, :scopes,
   user: [
     default: true,
     module: Foo.Accounts.UserScope,
@@ -70,7 +70,6 @@ config :phoenix, :scopes, [
     schema_key: :user_id,
     schema_type: :integer
   ]
-]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
