@@ -11,8 +11,7 @@ defmodule ScopesApp.Application do
       ScopesAppWeb.Telemetry,
       ScopesApp.Repo,
       {Ecto.Migrator,
-        repos: Application.fetch_env!(:scopes_app, :ecto_repos),
-        skip: skip_migrations?()},
+       repos: Application.fetch_env!(:scopes_app, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:scopes_app, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: ScopesApp.PubSub},
       # Start a worker by calling: ScopesApp.Worker.start_link(arg)
