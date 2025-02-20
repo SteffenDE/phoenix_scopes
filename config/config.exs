@@ -64,7 +64,7 @@ config :phoenix, :json_library, Jason
 config :phoenix, :scopes,
   user: [
     default: true,
-    module: Foo.Accounts.UserScope,
+    module: ScopeApp.UserScope,
     assign_key: :current_scope,
     access_path: [:user, :id],
     schema_key: :user_id,

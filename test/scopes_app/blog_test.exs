@@ -6,7 +6,7 @@ defmodule ScopesApp.BlogTest do
   describe "posts" do
     alias ScopesApp.Blog.Post
 
-    import Foo.Accounts.UserScopeFixtures
+    import ScopesApp.UserScopeFixtures
     import ScopesApp.BlogFixtures
 
     @invalid_attrs %{title: nil, body: nil}

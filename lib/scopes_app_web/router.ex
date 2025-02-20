@@ -1,6 +1,8 @@
 defmodule ScopesAppWeb.Router do
   use ScopesAppWeb, :router
 
+  import ScopesAppWeb.UserScope
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,6 +10,7 @@ defmodule ScopesAppWeb.Router do
     plug :put_root_layout, html: {ScopesAppWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :assign_scope
   end
 
   pipeline :api do
@@ -18,10 +21,13 @@ defmodule ScopesAppWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    live "/posts", PostLive.Index, :index
-    live "/posts/new", PostLive.Form, :new
-    live "/posts/:id", PostLive.Show, :show
-    live "/posts/:id/edit", PostLive.Form, :edit
+
+    live_session :scoped, on_mount: [{ScopesAppWeb.UserScope, :assign_scope}] do
+      live "/posts", PostLive.Index, :index
+      live "/posts/new", PostLive.Form, :new
+      live "/posts/:id", PostLive.Show, :show
+      live "/posts/:id/edit", PostLive.Form, :edit
+    end
   end
 
   # Other scopes may use custom stacks.

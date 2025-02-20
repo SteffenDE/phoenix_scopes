@@ -7,7 +7,7 @@ defmodule ScopesApp.Blog do
   alias ScopesApp.Repo
 
   alias ScopesApp.Blog.Post
-  alias Foo.Accounts.UserScope
+  alias ScopesApp.UserScope
 
   @doc """
   Subscribes to scoped notifications about any post changes.
